@@ -34,10 +34,6 @@ def get_cookies(path: Path) -> dict[str, str]:
     return cookies
 
 
-def to_date(date_str: str) -> date:
-    return datetime.strptime(date_str, "%Y-%m-%d").date()
-
-
 def to_url(screen_name: str, rest_id: str) -> str:
     return f"https://x.com/{screen_name}/status/{rest_id}"
 
@@ -67,13 +63,6 @@ def get_search_timeline(
         for tweet in response.data.data:
             if tweet.promoted_metadata is not None:
                 continue
-
-            if legacy := tweet.tweet.legacy:
-                created_at = datetime.strptime(
-                    legacy.created_at, "%a %b %d %H:%M:%S %z %Y"
-                )
-                if created_at.date() < since:
-                    return
             yield tweet
 
         if response.data.cursor.bottom is None:
@@ -84,7 +73,7 @@ def get_search_timeline(
 
         if response.header.rate_limit_remaining == 0:
             rate_limit_reset = datetime.fromtimestamp(response.header.rate_limit_reset)
-            sleep_seconds = (rate_limit_reset - datetime.now()).total_seconds() + 1
+            sleep_seconds = (rate_limit_reset - datetime.now()).total_seconds() + 10
             logger(f"Rate limit reached. Sleeping for {sleep_seconds} seconds.")
             sleep(sleep_seconds)
 
