@@ -56,7 +56,7 @@ def get_search_timeline(
             raw_query=f"{query} until:{until} since:{since}",
             product="Latest",
             cursor=last_cursor,
-            count=50,
+            count=20,
         )
 
         logger(f"Fetched {len(response.data.data)} tweets")
